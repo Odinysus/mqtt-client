@@ -1,11 +1,13 @@
 package com.odinysus.iot.common.mqtt;
 
+import com.odinysus.iot.bootstrap.AbsMqttProducer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.mqtt.MqttFixedHeader;
 import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.handler.timeout.IdleStateEvent;
-import lombok.extern.slf4j.Slf4j;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.Log4J2LoggerFactory;
 
 import java.util.Optional;
 
@@ -15,8 +17,9 @@ import java.util.Optional;
  * @author lxr
  * @create 2017-11-20 13:38
  **/
-@Slf4j
 public  abstract  class MqttHander extends SimpleChannelInboundHandler<MqttMessage> {
+
+    static private InternalLogger logger = Log4J2LoggerFactory.getInstance(MqttHander.class);
 
     MqttHandlerIntf mqttHandlerApi;
 
@@ -38,7 +41,7 @@ public  abstract  class MqttHander extends SimpleChannelInboundHandler<MqttMessa
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("【DefaultMqttHandler：channelInactive】"+ctx.channel().localAddress().toString()+"关闭成功");
+        logger.info("【DefaultMqttHandler：channelInactive】"+ctx.channel().localAddress().toString()+"关闭成功");
         mqttHandlerApi.close(ctx.channel());
     }
 

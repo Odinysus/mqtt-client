@@ -1,7 +1,5 @@
 package com.odinysus.iot.common.util;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

@@ -1,7 +1,7 @@
 package com.odinysus.iot.common.ssl;
 
 
-import org.jboss.netty.util.internal.SystemPropertyUtil;
+import io.netty.util.internal.SystemPropertyUtil;
 
 import javax.net.ssl.*;
 import java.security.KeyStore;

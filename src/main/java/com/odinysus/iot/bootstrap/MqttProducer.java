@@ -94,6 +94,9 @@ public class MqttProducer  extends  AbsMqttProducer{
     }
 
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
     private List<MqttTopicSubscription> getSubTopics(SubMessage[]subMessages ) {
         return  Optional.ofNullable(subMessages)

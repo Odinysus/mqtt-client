@@ -26,7 +26,7 @@
         </license>
     </licenses>
     <name>mqtt-client</name>
-    <description> an lib of mqtt client , depend on netty</description>
+    <description>an lib of mqtt client , depend on netty</description>
 
     <properties>
         <netty.version>4.1.25.Final</netty.version>
@@ -86,14 +86,14 @@
     </pluginRepositories>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>oss</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
         <repository>
-            <id>oss</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>releases</id>
+            <url>http://120.132.116.69:8081/repository/maven-releases/</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://120.132.116.69:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
 </project>

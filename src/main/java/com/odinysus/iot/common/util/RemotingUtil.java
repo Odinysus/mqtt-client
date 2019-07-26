@@ -17,8 +17,9 @@ package com.odinysus.iot.common.util;
  * limitations under the License.
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.odinysus.iot.common.mqtt.MqttHander;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.Log4J2LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -32,7 +33,7 @@ import java.util.Enumeration;
 public class RemotingUtil {
     public static final String OS_NAME = System.getProperty("os.name");
 
-    private static final Logger log = LoggerFactory.getLogger(RemotingUtil.class);
+    static private InternalLogger logger = Log4J2LoggerFactory.getInstance(RemotingUtil.class);
     private static boolean isLinuxPlatform = false;
     private static boolean isWindowsPlatform = false;
 
@@ -66,7 +67,7 @@ public class RemotingUtil {
                             }
                         }
                     } catch (final Exception e) {
-                        log.warn("Open ePoll Selector for linux platform exception", e);
+                        logger.warn("Open ePoll Selector for linux platform exception", e);
                     }
                 }
             } catch (final Exception e) {
@@ -124,7 +125,7 @@ public class RemotingUtil {
             final InetAddress localHost = InetAddress.getLocalHost();
             return normalizeHostAddress(localHost);
         } catch (Exception e) {
-            log.error("Failed to obtain local address", e);
+            logger.error("Failed to obtain local address", e);
         }
 
         return null;
