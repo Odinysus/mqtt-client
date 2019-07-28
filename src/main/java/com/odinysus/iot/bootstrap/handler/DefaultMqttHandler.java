@@ -16,6 +16,8 @@ import io.netty.handler.codec.mqtt.*;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
 
+import static java.lang.Thread.sleep;
+
 /**
  * 默认 mqtthandler处理
  *
@@ -125,6 +127,9 @@ public class DefaultMqttHandler extends MqttHander {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        mqttProducer.getNettyBootstrapClient().doubleConnect();
+        mqttHandlerApi.close(ctx.channel());
+        sleep(1000);
+        mqttProducer.connect(connectOptions);
+//        mqttProducer.getNettyBootstrapClient().doubleConnect();
     }
 }
