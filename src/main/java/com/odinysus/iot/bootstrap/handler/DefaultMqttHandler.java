@@ -131,11 +131,8 @@ public class DefaultMqttHandler extends MqttHander {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         final EventLoop eventLoop = ctx.channel().eventLoop();
-        eventLoop.schedule(new Runnable() {
-            @Override
-            public void run() {
-                mqttProducer.connect(connectOptions);
-            }
+        eventLoop.schedule(() -> {
+            mqttProducer.connect(connectOptions);
         }, 1L, TimeUnit.SECONDS);
         super.channelInactive(ctx);
     }

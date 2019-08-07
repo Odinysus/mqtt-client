@@ -200,11 +200,6 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
 
     public class NettyBootstrapClient extends AbstractBootstrapClient {
 
-        /**
-         * 断开连接的次数
-         */
-        private int connectTime = 1;
-
         private NioEventLoopGroup bossGroup;
 
         Bootstrap bootstrap=null ;// 启动辅助类
@@ -251,21 +246,10 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
                         }
                     });
             try {
-                Channel channel = bootstrap.connect(connectOptions.getServerIp(), connectOptions.getPort()).addListener(connectionListener).sync().channel();
-                connectTime = 1;
-                return channel;
+                return bootstrap.connect(connectOptions.getServerIp(), connectOptions.getPort()).addListener(connectionListener).sync().channel();
             } catch (Exception e) {
                 logger.info("connect to channel fail ",e);
-                try {
-                    sleep(10000 * connectTime * connectTime);
-                    if (connectTime == 100) {
-                        return null;
-                    }
-                    connectTime +=1;
-                    start();
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
+                e.printStackTrace();
             }
             return null;
         }
