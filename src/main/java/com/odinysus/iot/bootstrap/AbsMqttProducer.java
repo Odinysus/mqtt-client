@@ -7,6 +7,7 @@ import com.odinysus.iot.bootstrap.Bean.SubMessage;
 import com.odinysus.iot.bootstrap.cache.Cache;
 import com.odinysus.iot.bootstrap.channel.MqttHandlerServiceService;
 import com.odinysus.iot.bootstrap.handler.DefaultMqttHandler;
+import com.odinysus.iot.bootstrap.listener.ConnectionListener;
 import com.odinysus.iot.bootstrap.scan.SacnScheduled;
 import com.odinysus.iot.common.enums.ConfirmStatus;
 import com.odinysus.iot.common.ip.IpUtils;
@@ -59,6 +60,7 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
 
     protected List<MqttTopicSubscription> topics = new ArrayList<>();
 
+    protected ConnectionListener connectionListener;
 
     private static  final  int _BLACKLOG =   1024;
 
@@ -79,7 +81,8 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
     protected   void  connectTo(ConnectOptions connectOptions){
         checkConnectOptions(connectOptions);
         if(this.nettyBootstrapClient ==null){
-            this.nettyBootstrapClient = new NettyBootstrapClient(connectOptions);
+            this.connectionListener = new ConnectionListener(this, connectOptions);
+            this.nettyBootstrapClient = new NettyBootstrapClient(connectOptions, connectionListener);
         }
         this.channel =nettyBootstrapClient.start();
         initPool(connectOptions.getMinPeriod());
@@ -207,9 +210,11 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
 
         private ConnectOptions connectOptions;
 
+        private ConnectionListener connectionListener;
 
-        public NettyBootstrapClient(ConnectOptions connectOptions) {
+        public NettyBootstrapClient(ConnectOptions connectOptions, ConnectionListener connectionListener) {
             this.connectOptions = connectOptions;
+            this.connectionListener = connectionListener;
         }
 
 
@@ -245,7 +250,7 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
                         }
                     });
             try {
-                Channel channel = bootstrap.connect(connectOptions.getServerIp(), connectOptions.getPort()).sync().channel();
+                Channel channel = bootstrap.connect(connectOptions.getServerIp(), connectOptions.getPort()).addListener(connectionListener).sync().channel();
                 connectTime = 1;
                 return channel;
             } catch (Exception e) {

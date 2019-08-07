@@ -12,9 +12,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
@@ -127,9 +130,13 @@ public class DefaultMqttHandler extends MqttHander {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        mqttHandlerApi.close(ctx.channel());
-        sleep(1000);
-        mqttProducer.connect(connectOptions);
-//        mqttProducer.getNettyBootstrapClient().doubleConnect();
+        final EventLoop eventLoop = ctx.channel().eventLoop();
+        eventLoop.schedule(new Runnable() {
+            @Override
+            public void run() {
+                mqttProducer.connect(connectOptions);
+            }
+        }, 1L, TimeUnit.SECONDS);
+        super.channelInactive(ctx);
     }
 }
