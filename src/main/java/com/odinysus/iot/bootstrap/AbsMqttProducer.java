@@ -88,7 +88,7 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
         initPool(connectOptions.getMinPeriod());
         try {
             countDownLatch.await(connectOptions.getConnectTime(), TimeUnit.SECONDS);
-            subMessage(channel, topics, 0);
+            subMessage(channel, topics, MessageId.messageId());
         } catch (InterruptedException e) {
             logger.error("InterruptedException",e);
             nettyBootstrapClient.doubleConnect(); // 重新连接
