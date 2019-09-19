@@ -58,7 +58,9 @@ public class DefaultMqttHandler extends MqttHander {
         logger.info("【DefaultMqttHandler：channelActive】"+ctx.channel().localAddress().toString()+"启动成功");
         MqttFixedHeader mqttFixedHeader = new MqttFixedHeader(MqttMessageType.CONNECT,false, MqttQoS.AT_LEAST_ONCE,false,10);
         MqttConnectVariableHeader mqttConnectVariableHeader = new MqttConnectVariableHeader(MqttVersion.MQTT_3_1_1.protocolName(),MqttVersion.MQTT_3_1_1.protocolLevel(),mqtt.isHasUserName(),mqtt.isHasPassword(),mqtt.isHasWillRetain(),mqtt.getWillQos(),mqtt.isHasWillFlag(),mqtt.isHasCleanSession(),mqtt.getKeepAliveTime());
-        MqttConnectPayload mqttConnectPayload = new MqttConnectPayload(mqtt.getClientIdentifier(),mqtt.getWillTopic(),mqtt.getWillMessage(),mqtt.getUserName(),mqtt.getPassword());
+        byte message[] = mqtt.getWillMessage() == null ? null : mqtt.getWillMessage().getBytes();
+        byte password[] = mqtt.getPassword() == null ? null : mqtt.getPassword().getBytes();
+        MqttConnectPayload mqttConnectPayload = new MqttConnectPayload(mqtt.getClientIdentifier(), mqtt.getWillTopic(), message, mqtt.getUserName(), password);
         MqttConnectMessage mqttSubscribeMessage = new MqttConnectMessage(mqttFixedHeader,mqttConnectVariableHeader,mqttConnectPayload);
         channel.writeAndFlush(mqttSubscribeMessage);
     }
@@ -135,5 +137,6 @@ public class DefaultMqttHandler extends MqttHander {
             mqttProducer.connect(connectOptions);
         }, 1L, TimeUnit.SECONDS);
         super.channelInactive(ctx);
+        ctx.close();
     }
 }

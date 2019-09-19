@@ -211,6 +211,21 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
         public NettyBootstrapClient(ConnectOptions connectOptions, ConnectionListener connectionListener) {
             this.connectOptions = connectOptions;
             this.connectionListener = connectionListener;
+            initEventPool();
+            bootstrap.group(bossGroup)
+                    .channel(NioSocketChannel.class)
+                    .option(ChannelOption.TCP_NODELAY, connectOptions.isTcpNodelay())
+                    .option(ChannelOption.SO_KEEPALIVE, connectOptions.isKeepalive())
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .option(ChannelOption.SO_SNDBUF, connectOptions.getSndbuf())
+                    .option(ChannelOption.SO_RCVBUF, connectOptions.getRevbuf())
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            initHandler(ch.pipeline(),connectOptions,new DefaultMqttHandler(connectOptions,new MqttHandlerServiceService(), AbsMqttProducer.this, mqttListener));
+                        }
+                    });
         }
 
 
@@ -230,21 +245,7 @@ public abstract class AbsMqttProducer extends MqttApi implements  Producer {
         }
         @Override
         public Channel start() {
-            initEventPool();
-            bootstrap.group(bossGroup)
-                    .channel(NioSocketChannel.class)
-                    .option(ChannelOption.TCP_NODELAY, connectOptions.isTcpNodelay())
-                    .option(ChannelOption.SO_KEEPALIVE, connectOptions.isKeepalive())
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
-                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .option(ChannelOption.SO_SNDBUF, connectOptions.getSndbuf())
-                    .option(ChannelOption.SO_RCVBUF, connectOptions.getRevbuf())
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            initHandler(ch.pipeline(),connectOptions,new DefaultMqttHandler(connectOptions,new MqttHandlerServiceService(), AbsMqttProducer.this, mqttListener));
-                        }
-                    });
+
             try {
                 return bootstrap.connect(connectOptions.getServerIp(), connectOptions.getPort()).addListener(connectionListener).sync().channel();
             } catch (Exception e) {
